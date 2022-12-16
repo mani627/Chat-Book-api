@@ -8,6 +8,7 @@ app.use(cors());
 
 const server=http.createServer(app);
 
+const port= process.env.PORT||8080;
 
 const io= new Server(server,{
     cors:{
@@ -64,6 +65,11 @@ io.on("connection",(socket)=>{
 })
 
 
-server.listen(8080,()=>{
+
+app.get('/x', (req, res) => {
+    res.send('Hello World!')
+  })
+
+server.listen(port,()=>{
     console.log("connected")
 })
