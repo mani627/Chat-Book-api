@@ -26,16 +26,20 @@ let  database;
 
 // MongoDB CONNECTION CHECK
 async function Get_Database(){
+try{
+  const client=await MongoClient.connect(process.env.MONGO_CON) 
+  database= client.db('Library');
 
-    const client=await MongoClient.connect(process.env.MONGO_CON) 
-    database= client.db('Library');
-   
-    if(database){
-  console.log("con");
-    }else{
-  console.log("err");
-    }
-  return database
+  if(database){
+console.log("con");
+  }else{
+console.log("err");
+  }
+return database
+}catch(err){
+console.log("catch",err);
+}
+    
 
 }
 

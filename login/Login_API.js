@@ -17,9 +17,11 @@ router.post('/Login_User', async (req, res) => {
   // user3 - selva@gmail.com,Mani@1234
 
 
-
-
   try {
+
+    bcrypt.hash( req.body.password, 5, function(err, hash) {
+      console.log(hash)
+  });
     // Login
     let database = await db.Get_Database();
     const collection = database.collection('User_Details');
@@ -69,13 +71,15 @@ router.post('/Login_User', async (req, res) => {
 router.post('/Insert_book', auth, async (req, res) => {
 
   //  console.log(req.get('host'),req.protocol);
-  console.log(req.files);
+  console.log( req.files);
   let decoded_user = req.token_decoded.id;
   let img_path = ''
 
   try {
 
-    req.files.image_file.forEach(e => {
+    let files=Array.isArray( req.files.image_file)?req.files.image_file:[req.files.image_file]
+
+    files.forEach(e => {
       let modify_name = `${new Date().getTime()}_${e.name}`;
       let absolute_path = path.join(__dirname, '../', 'Images', '/')
       //only for file move
@@ -127,11 +131,9 @@ router.get('/get_book', auth, async (req, res) => {
 
   try {
 
-
-
     let database = await db.Get_Database();
     const collection = database.collection('Book_Details');
-    let cursor = await collection.find({}).skip(+req.query.skip).limit(+req.query.limit).toArray();
+    let cursor = await collection.find({}).sort({ _id: -1 }).skip(+req.query.skip).limit(+req.query.limit).toArray();
 
     res.json({
       mssg: cursor,
@@ -153,7 +155,6 @@ router.get('/get_book', auth, async (req, res) => {
 
 
 //get user's fav
-
 router.post('/get_book_fav', auth, async (req, res) => {
   let decoded_user = req.token_decoded.id;
 
