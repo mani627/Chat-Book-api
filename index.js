@@ -34,7 +34,7 @@ const port = process.env.PORT || 8080;
 
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:3000",
+        origin: "https://rad-stardust-7459d8.netlify.app",
         methods: ["GET", "POST"]
     }
 });
