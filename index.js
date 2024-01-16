@@ -31,7 +31,7 @@ const server = http.createServer(app);
 const port = process.env.PORT || 8080;
 
 // console.log(port)
-
+//https://rad-stardust-7459d8.netlify.app
 const io = new Server(server, {
     cors: {
         origin: "https://rad-stardust-7459d8.netlify.app",
