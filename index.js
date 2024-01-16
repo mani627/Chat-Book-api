@@ -30,11 +30,13 @@ const server = http.createServer(app);
 
 const port = process.env.PORT || 8080;
 
+//https://rad-stardust-7459d8.netlify.app/Chat_Area
 // console.log(port)
 //https://rad-stardust-7459d8.netlify.app
+//http://localhost:3000/
 const io = new Server(server, {
     cors: {
-        origin: "https://rad-stardust-7459d8.netlify.app",
+        origin: "https://rad-stardust-7459d8.netlify.app/Chat_Area",
         methods: ["GET", "POST"]
     }
 });
