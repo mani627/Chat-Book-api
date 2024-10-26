@@ -3,130 +3,92 @@ const app = express();
 const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
-const dotenv = require('dotenv');
+const dotenv = require("dotenv");
 const bodyparser = require("body-parser");
-const fileUpload = require('express-fileupload');
-
+const fileUpload = require("express-fileupload");
 
 //serve static files
-app.use('/Images', express.static(__dirname + '/Images'));
+app.use("/Images", express.static(__dirname + "/Images"));
 
 app.use(cors());
 // Fileupload
-app.use(fileUpload())
+app.use(fileUpload());
 //database constant config .env
 dotenv.config({
-    path: "./.env"
-})
+  path: "./.env",
+});
 
-
-// parsing requested 
+// parsing requested
 app.use(bodyparser.json());
-
-
-
 
 const server = http.createServer(app);
 
 const port = process.env.PORT || 8080;
 
-//https://rad-stardust-7459d8.netlify.app/Chat_Area
-// console.log(port)
-//https://rad-stardust-7459d8.netlify.app
-//http://localhost:3000/
 const io = new Server(server, {
-    cors: {
-        origin: "https://rad-stardust-7459d8.netlify.app",
-        methods: ["GET", "POST"]
-    }
+  cors: {
+    origin: "https://mani-portfolio-mern.netlify.app",
+    methods: ["GET", "POST"],
+  },
 });
 
 // Login API
-app.use("/", require('./login/Login_API'))
+app.use("/", require("./login/Login_API"));
 
 // test for initial connect
 io.on("connection", (socket) => {
-    console.log(socket.id)
+  console.log(socket.id);
 
+  // send mssg
 
+  socket.on("send", (data) => {
+    console.log("k", data);
+    socket.broadcast.to(data.room).emit("toall", data);
+  });
+  // typing
+  socket.on("typing", (data) => {
+    console.log(data);
+    socket.broadcast.to(data.room).emit("toall_typing", data);
+  });
 
+  // join group
+  socket.on("join_group", (data) => {
+    // console.log(data)
+    socket.join(data.room);
 
-    // send mssg
+    socket.broadcast.to(data.room).emit("toall_join_noti", data);
 
-    socket.on("send", (data) => {
-        console.log("k", data)
-        socket.broadcast.to(data.room).emit("toall", data)
+    console.log("joined");
+  });
 
-    })
-    // typing
-    socket.on("typing", (data) => {
-        console.log(data)
-        socket.broadcast.to(data.room).emit("toall_typing", data)
-    })
+  // click outside
+  socket.on("cancel_typing", () => {
+    socket.broadcast.emit("toall_cancel_typing");
+  });
 
-    // join group
-    socket.on("join_group", (data) => {
-        // console.log(data)
-        socket.join(data.room)
+  socket.on("disconnect", (data) => {
+    console.log("user offline", data);
+  });
 
-        socket.broadcast.to(data.room).emit("toall_join_noti", data)
-
-        console.log("joined")
-    })
-
-    // click outside
-    socket.on("cancel_typing", () => {
-
-        socket.broadcast.emit("toall_cancel_typing")
-    })
-
-    socket.on("disconnect", (data) => {
-        console.log("user offline", data);
-    })
-
-    // when user go back
-    socket.on("leave", (data) => {
-        socket.broadcast.to(data.room).emit("toall_leave", data.user)
-    })
-
-})
-
-
-
-
-
-// CONNECTION CHECK
-//const con = require('../Chat_Server/Connection/Connection');
-// con.connect((err) => {
-//     if (err) {
-//       console.log("Database Connection Failed !!!", err);
-//     } else {
-//       console.log("connected to Database");
-//     }
-// });
-
-
-
-
-
+  // when user go back
+  socket.on("leave", (data) => {
+    socket.broadcast.to(data.room).emit("toall_leave", data.user);
+  });
+});
 
 // check port name
 // req.socket.localPort
 
 // erro throw url
 app.get("*", function (req, res) {
-    res.sendStatus(404)
-})
+  res.sendStatus(404);
+});
 
 // erro throw url
 app.post("*", function (req, res) {
-    res.sendStatus(404)
-})
-
-
-
-
+  res.sendStatus(404);
+});
 
 server.listen(port, () => {
-    console.log("connected")
-})
+  console.log("connected");
+});
